@@ -1,38 +1,39 @@
 # Prueba Técnica Backend - Gestión de Usuarios
 
-Este repositorio contiene la solución a la prueba técnica para el puesto de Backend Developer. El proyecto consiste en una API REST desarrollada con **NestJS** y **MongoDB**, dockerizada y documentada.
+Este repositorio contiene la solución a la prueba técnica para el puesto de Backend Developer. El proyecto consiste en una API REST desarrollada con **NestJS** y **MongoDB**, que incluye gestión de usuarios, validaciones estrictas y un sistema de control de acceso basado en roles (RBAC).
 
-## Descripción del Proyecto
+## Características Principales
 
-El objetivo es gestionar usuarios y perfiles mediante operaciones CRUD, implementando validaciones, manejo de errores y filtros de búsqueda.
+* **CRUD Completo:** Creación, lectura, actualización y eliminación de usuarios.
+* **Persistencia Real:** Uso de MongoDB (Mongoose) en lugar de memoria volátil.
+* **Seguridad y Roles:** Implementación de permisos diferenciados para `admin` y `user`.
+* **Validaciones:** Uso de DTOs, Enums y Sanitización de datos.
+* **Docker:** Entorno contenerizado listo para producción.
+* **Documentación:** API documentada automáticamente con Swagger/OpenAPI.
 
 ### Stack Tecnológico
 * **Framework:** NestJS (Node.js)
 * **Base de Datos:** MongoDB (Mongoose)
 * **Validación:** Class-Validator & Class-Transformer
-* **Documentación:** Swagger (OpenAPI)
-* **Contenerización:** Docker
+* **Documentación:** Swagger
+* **Testing:** Jest
 
 ---
 
 ## Instrucciones de Instalación y Ejecución
 
 ### Requisitos Previos
-* Node.js (v18+)
-* Docker & Docker Compose (Opcional, pero recomendado)
-* Una instancia de MongoDB corriendo localmente (si no usar Docker)
+* Docker & Docker Compose (Recomendado)
+* O bien: Node.js (v18+) y MongoDB local.
 
 ### Opción 1: Ejecución con Docker (Recomendada)
-Esta es la forma más rápida de probar la aplicación, ya que levanta tanto la API como la base de datos automáticamente.
+Levanta la API y la Base de Datos automáticamente en un entorno aislado.
 
-1.  **Construir y levantar el contenedor:**
+1.  **Construir y levantar los servicios:**
     ```bash
-    docker build -t prueba-backend-global-think .
-    docker run -p 3000:3000 prueba-backend-global-think
+    docker-compose up --build
     ```
-    *(Nota: Si tuvieras un `docker-compose.yml` que incluya Mongo, sería: `docker-compose up --build`)*
-
-2.  La API estará disponible en: `http://localhost:3000`
+2.  La API estará disponible en: `http://localhost:3000/api`
 
 ### Opción 2: Ejecución Local (Desarrollo)
 
@@ -40,32 +41,55 @@ Esta es la forma más rápida de probar la aplicación, ya que levanta tanto la 
     ```bash
     npm install
     ```
-
-2.  **Configurar variables de entorno:**
-    Asegúrate de tener una instancia de MongoDB corriendo en `mongodb://localhost:27017/prueba-tecnica` o configura un archivo `.env`.
-
-3.  **Levantar el servidor en modo desarrollo:**
+2.  **Configurar entorno:** Asegúrate de tener MongoDB corriendo en `localhost:27017`.
+3.  **Iniciar servidor:**
     ```bash
     npm run start:dev
     ```
 
 ---
 
-## Documentación de la API (Swagger)
+## Seguridad y Roles (RBAC)
 
-La documentación interactiva de los endpoints está disponible en la ruta `/api`.
-* **URL:** [http://localhost:3000/api](http://localhost:3000/api)
+El sistema implementa un control de acceso mediante Headers HTTP. Existen dos roles permitidos:
 
-Aquí podrás probar directamente los endpoints:
-* `GET /users`: Listar usuarios (acepta query param `?search=texto` para filtrar).
-* `POST /users`: Crear usuario (valida email único).
-* `DELETE /users/:id`: Eliminar usuario (requiere header `role: admin`).
+1.  **Admin (`admin`):** Acceso total (Crear, Leer, Actualizar, Borrar).
+2.  **User (`user`):** Acceso limitado (Solo Leer/Consultar).
+
+### Cómo probar los permisos en Swagger
+Para ejecutar operaciones protegidas (`POST`, `PATCH`, `DELETE`), debes enviar el siguiente **Header** en la petición:
+
+* **Key:** `role`
+* **Value:** `admin` (o `user` para probar que te deniegue el acceso).
+
+> **Nota:** Si intentas borrar o crear un usuario enviando `role: user`, recibirás un error `403 Forbidden`.
+
+### Validación de Perfiles
+Al crear un usuario, el campo `nombre_perfil` está restringido estrictamente a los valores del sistema (Enum):
+* `admin`
+* `user`
+
+Cualquier otro valor generará un error `400 Bad Request`.
+
+---
+
+## Endpoints Disponibles
+
+La documentación interactiva se encuentra en: [http://localhost:3000/api](http://localhost:3000/api)
+
+| Método | Endpoint | Descripción | Requiere Rol (Header) |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/users` | Listar usuarios (Filtro `?search=`) |Admin o User |
+| `GET` | `/users/:id` | Obtener detalle de usuario | Admin o User |
+| `POST` | `/users` | Crear nuevo usuario | Admin |
+| `PATCH` | `/users/:id` | Actualizar usuario | Admin |
+| `DELETE` | `/users/:id` | Eliminar usuario | Admin |
 
 ---
 
 ## Pruebas Unitarias
 
-El proyecto incluye pruebas unitarias utilizando **Jest**.
+El proyecto incluye pruebas unitarias para Controladores y Servicios, utilizando Mocks para aislar la base de datos.
 
 Para ejecutar los tests:
 ```bash

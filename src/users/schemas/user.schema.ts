@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-// Definimos el Perfil como un sub-documento
+// Definicion del Perfil como un sub-documento
 @Schema()
 export class Profile {
     @Prop()
@@ -13,8 +13,6 @@ export class Profile {
 
 @Schema()
 export class User extends Document {
-    // MongoDB genera el 'id' automáticamente, pero lo mapeamos si es necesario
-
     @Prop({ required: true })
     nombre: string;
 

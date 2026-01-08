@@ -1,17 +1,21 @@
-import { IsEmail, IsNotEmpty, IsNumber, IsString, ValidateNested, IsObject } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsNumber, IsString, ValidateNested, IsObject, IsEnum } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
+export enum UserRole {
+    ADMIN = 'admin',
+    USER = 'user',
+}
+
 class ProfileDto {
-    @ApiProperty({ example: 'ADMIN_01' })
+    @ApiProperty({ example: 'C01' })
     @IsString()
     @IsNotEmpty()
     codigo: string;
 
-    @ApiProperty({ example: 'Administrador' })
-    @IsString()
-    @IsNotEmpty()
-    nombre_perfil: string;
+    @ApiProperty({ example: 'admin', enum: UserRole })
+    @IsEnum(UserRole, { message: 'El rol debe ser admin o user' })
+    nombre_perfil: UserRole;
 }
 
 export class CreateUserDto {
