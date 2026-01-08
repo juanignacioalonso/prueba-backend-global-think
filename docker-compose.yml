@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  # Servicio de Base de Datos
+  mongo:
+    image: mongo:6.0 # Usamos una versión específica para estabilidad
+    container_name: mongodb_prueba
+    ports:
+      - "27017:27017" # Expone el puerto para que puedas conectarte desde tu PC (ej. MongoDB Compass)
+    volumes:
+      - mongo-data:/data/db # Persistencia de datos (para no perderlos al apagar el contenedor)
+    networks:
+      - nest-network
+
+  # Servicio de tu Aplicación NestJS
+  api:
+    build: .
+    container_name: nestjs_api
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo # Espera a que Mongo inicie
+    environment:
+      # OJO AQUÍ: Dentro de Docker, el host no es 'localhost', es el nombre del servicio ('mongo')
+      - MONGO_URI=mongodb://mongo:27017/prueba-tecnica
+    networks:
+      - nest-network
+
+volumes:
+  mongo-data:
+
+networks:
+  nest-network:
