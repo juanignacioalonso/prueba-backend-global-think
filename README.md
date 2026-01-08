@@ -59,7 +59,6 @@ El sistema implementa un control de acceso mediante **JSON Web Tokens (Bearer To
 2.  **User (`user`):** Acceso limitado (Solo lectura y actualización propia).
 
 ### Cómo probar los permisos en Swagger
-A diferencia de la versión anterior (headers manuales), ahora debes autenticarte para obtener acceso:
 
 1.  **Obtener Token:**
     * Ve al endpoint `POST /auth/login`.
