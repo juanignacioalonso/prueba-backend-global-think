@@ -1,19 +1,21 @@
 # Prueba Técnica Backend - Gestión de Usuarios
 
-Este repositorio contiene la solución a la prueba técnica para el puesto de Backend Developer. El proyecto consiste en una API REST desarrollada con **NestJS** y **MongoDB**, que incluye gestión de usuarios, validaciones estrictas y un sistema de control de acceso basado en roles (RBAC).
+Este repositorio contiene la solución a la prueba técnica para el puesto de Backend Developer. El proyecto consiste en una API REST desarrollada con **NestJS** y **MongoDB**, que incluye gestión de usuarios, autenticación segura vía **JWT**, validaciones estrictas y un sistema de control de acceso basado en roles (RBAC).
 
 ## Características Principales
 
 * **CRUD Completo:** Creación, lectura, actualización y eliminación de usuarios.
 * **Persistencia Real:** Uso de MongoDB (Mongoose) en lugar de memoria volátil.
-* **Seguridad y Roles:** Implementación de permisos diferenciados para `admin` y `user`.
-* **Validaciones:** Uso de DTOs, Enums y Sanitización de datos.
+* **Seguridad Avanzada:** Autenticación mediante **Tokens JWT** y contraseñas encriptadas con **Bcrypt**.
+* **Roles y Permisos:** Implementación de guards para proteger rutas según rol (`admin` o `user`).
+* **Validaciones:** Uso de DTOs, Enums y manejo de errores de base de datos (ej: emails duplicados).
 * **Docker:** Entorno contenerizado listo para producción.
 * **Documentación:** API documentada automáticamente con Swagger/OpenAPI.
 
 ### Stack Tecnológico
 * **Framework:** NestJS (Node.js)
 * **Base de Datos:** MongoDB (Mongoose)
+* **Seguridad:** Passport, JWT, Bcrypt
 * **Validación:** Class-Validator & Class-Transformer
 * **Documentación:** Swagger
 * **Testing:** Jest
@@ -49,27 +51,32 @@ Levanta la API y la Base de Datos automáticamente en un entorno aislado.
 
 ---
 
-## Seguridad y Roles (RBAC)
+## Seguridad y Roles (RBAC con JWT)
 
-El sistema implementa un control de acceso mediante Headers HTTP. Existen dos roles permitidos:
+El sistema implementa un control de acceso mediante **JSON Web Tokens (Bearer Token)**. Existen dos roles permitidos:
 
 1.  **Admin (`admin`):** Acceso total (Crear, Leer, Actualizar, Borrar).
-2.  **User (`user`):** Acceso limitado (Solo Leer/Consultar).
+2.  **User (`user`):** Acceso limitado (Solo lectura y actualización propia).
 
 ### Cómo probar los permisos en Swagger
-Para ejecutar operaciones protegidas (`POST`, `PATCH`, `DELETE`), debes enviar el siguiente **Header** en la petición:
+A diferencia de la versión anterior (headers manuales), ahora debes autenticarte para obtener acceso:
 
-* **Key:** `role`
-* **Value:** `admin` (o `user` para probar que te deniegue el acceso).
+1.  **Obtener Token:**
+    * Ve al endpoint `POST /auth/login`.
+    * Ingresa credenciales válidas.
+    * Copia el `access_token` de la respuesta.
+2.  **Autorizar:**
+    * Sube al botón verde **Authorize** (arriba a la derecha).
+    * Pega el token en el campo `Value`.
+    * Haz clic en **Authorize** y luego **Close**.
+3.  **Probar:**
+    * Ahora ejecuta operaciones protegidas como `GET /users`. El token se enviará automáticamente.
 
-> **Nota:** Si intentas borrar o crear un usuario enviando `role: user`, recibirás un error `403 Forbidden`.
+> **Nota Importante:** Si intentas acceder a una ruta protegida sin token, recibirás un `401 Unauthorized`. Si tienes token pero no el rol adecuado, recibirás un `403 Forbidden`.
 
-### Validación de Perfiles
-Al crear un usuario, el campo `nombre_perfil` está restringido estrictamente a los valores del sistema (Enum):
-* `admin`
-* `user`
-
-Cualquier otro valor generará un error `400 Bad Request`.
+### Validación de Datos
+* **Emails Duplicados:** Si intentas crear o actualizar un usuario con un email ya existente, recibirás un error `409 Conflict`.
+* **Perfiles:** El campo `nombre_perfil` sigue restringido estrictamente a `admin` o `user`.
 
 ---
 
@@ -77,13 +84,14 @@ Cualquier otro valor generará un error `400 Bad Request`.
 
 La documentación interactiva se encuentra en: [http://localhost:3000/api](http://localhost:3000/api)
 
-| Método | Endpoint | Descripción | Requiere Rol (Header) |
+| Método | Endpoint | Descripción | Requiere Autenticación |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/users` | Listar usuarios (Filtro `?search=`) |Admin o User |
-| `GET` | `/users/:id` | Obtener detalle de usuario | Admin o User |
-| `POST` | `/users` | Crear nuevo usuario | Admin |
-| `PATCH` | `/users/:id` | Actualizar usuario | Admin |
-| `DELETE` | `/users/:id` | Eliminar usuario | Admin |
+| `POST` | `/auth/login` | Iniciar sesión y obtener Token JWT | No (Público) |
+| `GET` | `/users` | Listar usuarios (Filtro `?role=`) | Sí (Admin/User) |
+| `GET` | `/users/:id` | Obtener detalle de usuario | Sí (Admin/User) |
+| `POST` | `/users` | Crear nuevo usuario | Sí (Solo Admin) |
+| `PATCH` | `/users/:id` | Actualizar usuario | Sí (Solo Admin) |
+| `DELETE` | `/users/:id` | Eliminar usuario | Sí (Solo Admin) |
 
 ---
 

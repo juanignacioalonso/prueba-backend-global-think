@@ -4,6 +4,7 @@ import { Model, isValidObjectId } from 'mongoose';
 import { User } from './schemas/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -11,9 +12,17 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     try {
-      const createdUser = new this.userModel(createUserDto);
+      const { password, ...userData } = createUserDto;
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+
+      const createdUser = new this.userModel({
+        ...userData,
+        password: hashedPassword,
+      });
+
       return await createdUser.save();
-    } catch (error) {
+    } catch (error: any) {
       if (error.code === 11000) {
         throw new ConflictException('El correo electrónico ya existe');
       }
@@ -21,15 +30,12 @@ export class UsersService {
     }
   }
 
-  async findAll(search?: string): Promise<User[]> {
-    const filter = search
-      ? {
-        $or: [
-          { nombre: { $regex: search, $options: 'i' } },
-          { email: { $regex: search, $options: 'i' } }
-        ]
-      }
-      : {};
+  async findOneByEmail(email: string): Promise<User | null> {
+    return this.userModel.findOne({ email }).exec();
+  }
+
+  async findAll(role?: string): Promise<User[]> {
+    const filter = role ? { 'perfil.nombre_perfil': role } : {};
     return this.userModel.find(filter).exec();
   }
 
@@ -48,13 +54,28 @@ export class UsersService {
       throw new BadRequestException(`El ID '${id}' no es válido para MongoDB`);
     }
 
-    const updatedUser = await this.userModel
-      .findByIdAndUpdate(id, updateUserDto, { new: true })
-      .exec();
+    if (updateUserDto.password) {
+      const salt = await bcrypt.genSalt(10);
+      updateUserDto.password = await bcrypt.hash(updateUserDto.password, salt);
+    }
 
-    if (!updatedUser) throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
+    try {
+      const updatedUser = await this.userModel
+        .findByIdAndUpdate(id, updateUserDto, { new: true })
+        .exec();
 
-    return updatedUser;
+      if (!updatedUser) throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
+      return updatedUser;
+
+    } catch (error: any) {
+      if (error.code === 11000 || error.codeName === 'DuplicateKey') {
+        throw new ConflictException('El correo electrónico ya está en uso por otro usuario');
+      }
+      if (error instanceof NotFoundException) throw error;
+
+      console.error('Error no controlado en update:', error);
+      throw new InternalServerErrorException('Error al actualizar el usuario');
+    }
   }
 
   async remove(id: string): Promise<void> {
