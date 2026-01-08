@@ -2,7 +2,7 @@
 
 Este repositorio contiene la solución a la prueba técnica para el puesto de Backend Developer. El proyecto consiste en una API REST desarrollada con **NestJS** y **MongoDB**, dockerizada y documentada.
 
-## 📋 Descripción del Proyecto
+## Descripción del Proyecto
 
 El objetivo es gestionar usuarios y perfiles mediante operaciones CRUD, implementando validaciones, manejo de errores y filtros de búsqueda.
 
@@ -15,12 +15,12 @@ El objetivo es gestionar usuarios y perfiles mediante operaciones CRUD, implemen
 
 ---
 
-## 🚀 Instrucciones de Instalación y Ejecución
+## Instrucciones de Instalación y Ejecución
 
 ### Requisitos Previos
 * Node.js (v18+)
 * Docker & Docker Compose (Opcional, pero recomendado)
-* Una instancia de MongoDB corriendo localmente (si no usas Docker)
+* Una instancia de MongoDB corriendo localmente (si no usar Docker)
 
 ### Opción 1: Ejecución con Docker (Recomendada)
 Esta es la forma más rápida de probar la aplicación, ya que levanta tanto la API como la base de datos automáticamente.
@@ -51,7 +51,7 @@ Esta es la forma más rápida de probar la aplicación, ya que levanta tanto la 
 
 ---
 
-## 📚 Documentación de la API (Swagger)
+## Documentación de la API (Swagger)
 
 La documentación interactiva de los endpoints está disponible en la ruta `/api`.
 * **URL:** [http://localhost:3000/api](http://localhost:3000/api)
@@ -63,7 +63,7 @@ Aquí podrás probar directamente los endpoints:
 
 ---
 
-## 🧪 Pruebas Unitarias
+## Pruebas Unitarias
 
 El proyecto incluye pruebas unitarias utilizando **Jest**.
 
