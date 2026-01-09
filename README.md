@@ -88,7 +88,7 @@ La documentación interactiva se encuentra en: [http://localhost:3000/api](http:
 | `POST` | `/auth/login` | Iniciar sesión y obtener Token JWT | No (Público) |
 | `GET` | `/users` | Listar usuarios (Filtro `?role=`) | Sí (Admin/User) |
 | `GET` | `/users/:id` | Obtener detalle de usuario | Sí (Admin/User) |
-| `POST` | `/users` | Crear nuevo usuario | Sí (Solo Admin) |
+| `POST` | `/users` | Crear nuevo usuario | Sí (Solo Admin) | Codigo de perfil: Admin (C01) y User (C02)
 | `PATCH` | `/users/:id` | Actualizar usuario | Sí (Solo Admin) |
 | `DELETE` | `/users/:id` | Eliminar usuario | Sí (Solo Admin) |
 
