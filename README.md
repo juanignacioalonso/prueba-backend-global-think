@@ -96,8 +96,52 @@ La documentación interactiva se encuentra en: [http://localhost:3000/api](http:
 
 ## Pruebas Unitarias
 
-El proyecto incluye pruebas unitarias para Controladores y Servicios, utilizando Mocks para aislar la base de datos.
+Este proyecto cuenta con una suite robusta de pruebas unitarias implementadas con Jest. Se utiliza la técnica de Mocking para aislar las dependencias (Base de datos, servicios externos, librerías de encriptación) y garantizar pruebas rápidas y fiables.
 
-Para ejecutar los tests:
-```bash
+# Ejecutar todas las pruebas unitarias
 npm run test
+
+# Ejecutar pruebas en modo "reloj" (Watch Mode)
+# Ideal mientras estás programando, se re-ejecuta al guardar cambios
+npm run test:watch
+
+# Ver reporte de Cobertura de Código (Code Coverage)
+# Muestra qué porcentaje del código está cubierto por tests
+npm run test:cov
+
+## Alcance de las Pruebas (Coverage Scope)
+Actualmente, el sistema cuenta con cobertura en los módulos críticos de negocio:
+
+Módulo de Usuarios (UsersModule)
+Service (UsersService):
+
+✅ Creación de usuarios Admin (C01) y User (C02) con expansión automática de perfiles.
+
+✅ Lógica de encriptación de contraseñas antes de guardar.
+
+✅ Manejo de errores (Emails duplicados, IDs inválidos).
+
+✅ Mocking completo de Mongoose (MongoDB).
+
+Controller (UsersController):
+
+✅ Verificación de rutas y códigos de estado HTTP.
+
+✅ Comunicación correcta con el servicio mediante DTOs.
+
+Módulo de Autenticación (AuthModule)
+Service (AuthService):
+
+✅ Flujo completo de Login.
+
+✅ Mocking de Bcrypt para validación de contraseñas.
+
+✅ Mocking de JwtService para la firma y generación de Tokens.
+
+✅ Validación de payload en el Token (incluyendo Roles).
+
+Controller (AuthController):
+
+✅ Validación del endpoint POST /auth/login.
+
+✅ Recepción correcta de LoginDto.
