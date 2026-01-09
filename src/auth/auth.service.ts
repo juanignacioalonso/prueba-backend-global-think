@@ -5,6 +5,9 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
+    validateUser(arg0: string, arg1: string) {
+        throw new Error('Method not implemented.');
+    }
     constructor(
         private usersService: UsersService,
         private jwtService: JwtService

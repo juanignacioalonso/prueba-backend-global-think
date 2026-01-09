@@ -1,9 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-// Definicion del Perfil como un sub-documento
-@Schema()
+@Schema({ _id: false })
 export class Profile {
+    @Prop()
+    id: number;
+
     @Prop()
     codigo: string;
 
@@ -25,7 +27,7 @@ export class User extends Document {
     @Prop({ required: true })
     password: string;
 
-    @Prop({ type: Profile, required: true }) // Perfil anidado
+    @Prop({ type: Profile, required: true })
     perfil: Profile;
 }
 

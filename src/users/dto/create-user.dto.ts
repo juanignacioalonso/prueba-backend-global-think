@@ -1,22 +1,5 @@
-import { IsEmail, IsNotEmpty, IsNumber, IsString, ValidateNested, IsObject, IsEnum, MinLength } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsEmail, IsNotEmpty, IsNumber, IsString, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-
-export enum UserRole {
-    ADMIN = 'admin',
-    USER = 'user',
-}
-
-class ProfileDto {
-    @ApiProperty({ example: 'C01' })
-    @IsString()
-    @IsNotEmpty()
-    codigo: string;
-
-    @ApiProperty({ example: 'admin', enum: UserRole })
-    @IsEnum(UserRole, { message: 'El rol debe ser admin o user' })
-    nombre_perfil: UserRole;
-}
 
 export class CreateUserDto {
     @ApiProperty({ example: 'Juan Perez' })
@@ -40,9 +23,11 @@ export class CreateUserDto {
     @IsNotEmpty()
     edad: number;
 
-    @ApiProperty()
-    @IsObject()
-    @ValidateNested()
-    @Type(() => ProfileDto)
-    perfil: ProfileDto;
+    @ApiProperty({
+        example: 'C01',
+        description: 'Código de perfil: C01 para Admin (crea perfil completo), C02 para User'
+    })
+    @IsString()
+    @IsNotEmpty()
+    codigoPerfil: string;
 }
