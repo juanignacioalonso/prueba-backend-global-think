@@ -1,32 +1,36 @@
-# Prueba Técnica Backend - Gestión de Usuarios
-
-Este repositorio contiene la solución a la prueba técnica para el puesto de Backend Developer. El proyecto consiste en una API REST desarrollada con **NestJS** y **MongoDB**, que incluye gestión de usuarios, autenticación segura vía **JWT**, validaciones estrictas y un sistema de control de acceso basado en roles (RBAC).
-
 ## Características Principales
 
-* **CRUD Completo:** Creación, lectura, actualización y eliminación de usuarios.
-* **Persistencia Real:** Uso de MongoDB (Mongoose) en lugar de memoria volátil.
-* **Seguridad Avanzada:** Autenticación mediante **Tokens JWT** y contraseñas encriptadas con **Bcrypt**.
-* **Roles y Permisos:** Implementación de guards para proteger rutas según rol (`admin` o `user`).
-* **Validaciones:** Uso de DTOs, Enums y manejo de errores de base de datos (ej: emails duplicados).
-* **Docker:** Entorno contenerizado listo para producción.
-* **Documentación:** API documentada automáticamente con Swagger/OpenAPI.
+* **CRUD Completo:** Gestión integral del ciclo de vida de los usuarios.
+* **Abstracción de Perfiles:** Lógica de negocio encapsulada para la creación de perfiles mediante códigos (`C01`, `C02`).
+* **Persistencia Real:** Base de datos **MongoDB** (con Mongoose ODM).
+* **Seguridad Avanzada:**
+    * Autenticación mediante **Tokens JWT**.
+    * Hashing de contraseñas con **Bcrypt**.
+    * Guards para protección de rutas.
+* **Calidad de Código:**
+    * Validación de datos con DTOs (`class-validator`).
+    * Manejo de errores centralizado (ej: correos duplicados).
+    * **Testing Unitario** con Jest y Mocking.
+* **Infraestructura:** Contenerización con **Docker** y Docker Compose.
+* **Documentación:** API documentada automáticamente con **Swagger**.
 
 ### Stack Tecnológico
-* **Framework:** NestJS (Node.js)
-* **Base de Datos:** MongoDB (Mongoose)
-* **Seguridad:** Passport, JWT, Bcrypt
-* **Validación:** Class-Validator & Class-Transformer
-* **Documentación:** Swagger
-* **Testing:** Jest
+
+| Categoría | Tecnología |
+| :--- | :--- |
+| **Framework** | NestJS (Node.js) |
+| **Base de Datos** | MongoDB (Mongoose) |
+| **Seguridad** | Passport, JWT, Bcrypt |
+| **Testing** | Jest, Supertest |
+| **Documentación** | Swagger / OpenAPI |
 
 ---
 
 ## Instrucciones de Instalación y Ejecución
 
 ### Requisitos Previos
-* Docker & Docker Compose (Recomendado)
-* O bien: Node.js (v18+) y MongoDB local.
+* **Docker & Docker Compose** (Recomendado)
+* O bien: Node.js (v18+) y una instancia de MongoDB corriendo localmente.
 
 ### Opción 1: Ejecución con Docker (Recomendada)
 Levanta la API y la Base de Datos automáticamente en un entorno aislado.
@@ -43,7 +47,7 @@ Levanta la API y la Base de Datos automáticamente en un entorno aislado.
     ```bash
     npm install
     ```
-2.  **Configurar entorno:** Asegúrate de tener MongoDB corriendo en `localhost:27017`.
+2.  **Configurar entorno:** Asegúrate de tener MongoDB corriendo en `localhost:27017` o configura tu `.env`.
 3.  **Iniciar servidor:**
     ```bash
     npm run start:dev
@@ -51,65 +55,65 @@ Levanta la API y la Base de Datos automáticamente en un entorno aislado.
 
 ---
 
-## Seguridad y Roles (RBAC con JWT)
+## Seguridad y Lógica de Negocio
 
-El sistema implementa un control de acceso mediante **JSON Web Tokens (Bearer Token)**. Existen dos roles permitidos:
+### 1. Gestión de Perfiles (Business Logic)
+El sistema utiliza códigos de perfil para abstraer la creación de roles. Al crear o editar un usuario, no se envían objetos complejos, sino un código simple:
 
-1.  **Admin (`admin`):** Acceso total (Crear, Leer, Actualizar, Borrar).
-2.  **User (`user`):** Acceso limitado (Solo lectura y actualización propia).
+| Código | Rol Generado | Permisos |
+| :--- | :--- | :--- |
+| **`C01`** | **Admin** | Acceso total (Crear, Leer, Editar, Borrar). |
+| **`C02`** | **User** | Acceso limitado (Solo lectura). |
 
-### Cómo probar los permisos en Swagger
+### 2. Autenticación (RBAC con JWT)
+El sistema implementa control de acceso basado en roles.
+* **Rutas Públicas:** Login.
+* **Rutas Privadas:** Gestión de usuarios (Requiere Header `Authorization: Bearer <token>`).
 
-1.  **Obtener Token:**
-    * Ve al endpoint `POST /auth/login`.
-    * Ingresa credenciales válidas.
-    * Copia el `access_token` de la respuesta.
-2.  **Autorizar:**
-    * Sube al botón verde **Authorize** (arriba a la derecha).
-    * Pega el token en el campo `Value`.
-    * Haz clic en **Authorize** y luego **Close**.
-3.  **Probar:**
-    * Ahora ejecuta operaciones protegidas como `GET /users`. El token se enviará automáticamente.
-
-> **Nota Importante:** Si intentas acceder a una ruta protegida sin token, recibirás un `401 Unauthorized`. Si tienes token pero no el rol adecuado, recibirás un `403 Forbidden`.
-
-### Validación de Datos
-* **Emails Duplicados:** Si intentas crear o actualizar un usuario con un email ya existente, recibirás un error `409 Conflict`.
-* **Perfiles:** El campo `nombre_perfil` sigue restringido estrictamente a `admin` o `user`.
+### Cómo probar en Swagger
+1.  Ve al endpoint `POST /auth/login` e ingresa credenciales válidas.
+2.  Copia el `access_token` de la respuesta.
+3.  Sube al botón verde **Authorize** (arriba a la derecha).
+4.  Pega el token en el campo `Value`, haz clic en **Authorize** y luego **Close**.
+5.  Ahora puedes ejecutar las rutas protegidas (candado cerrado).
 
 ---
 
-## Endpoints Disponibles
+## 📡 Endpoints Disponibles
 
-La documentación interactiva se encuentra en: [http://localhost:3000/api](http://localhost:3000/api)
+La documentación interactiva completa se encuentra en: [http://localhost:3000/api](http://localhost:3000/api)
 
-| Método | Endpoint | Descripción | Requiere Autenticación |
-| :--- | :--- | :--- | :--- |
-| `POST` | `/auth/login` | Iniciar sesión y obtener Token JWT | No (Público) |
-| `GET` | `/users` | Listar usuarios (Filtro `?role=`) | Sí (Admin/User) |
-| `GET` | `/users/:id` | Obtener detalle de usuario | Sí (Admin/User) |
-| `POST` | `/users` | Crear nuevo usuario | Sí (Solo Admin) | Codigo de perfil: Admin (C01) y User (C02)
-| `PATCH` | `/users/:id` | Actualizar usuario | Sí (Solo Admin) |
-| `DELETE` | `/users/:id` | Eliminar usuario | Sí (Solo Admin) |
+| Método | Endpoint | Descripción | Auth | Nota |
+| :--- | :--- | :--- | :--- | :--- |
+| `POST` | `/auth/login` | Login y obtención de Token | 🔓 No | Retorna JWT |
+| `GET` | `/users` | Listar usuarios | 🔒 Sí | Filtros opcionales |
+| `GET` | `/users/:id` | Obtener usuario por ID | 🔒 Sí | Valida MongoID |
+| `POST` | `/users` | Crear usuario | 🔒 Sí | Usar `codigoPerfil`: "C01" o "C02" |
+| `PATCH` | `/users/:id` | Actualizar usuario | 🔒 Sí | Actualiza perfil por código |
+| `DELETE` | `/users/:id` | Eliminar usuario | 🔒 Sí | Soft o Hard delete según config |
 
 ---
 
-## Pruebas Unitarias
+## 🧪 Pruebas Unitarias (Testing)
 
-Este proyecto cuenta con una suite robusta de pruebas unitarias implementadas con Jest. Se utiliza la técnica de Mocking para aislar las dependencias (Base de datos, servicios externos, librerías de encriptación) y garantizar pruebas rápidas y fiables.
+Este proyecto cuenta con una suite robusta de pruebas unitarias implementadas con **Jest**. Se utiliza la técnica de **Mocking** para aislar dependencias y garantizar la fiabilidad del código sin requerir conexión real a la base de datos durante los tests.
 
+### Comandos de Testing
+
+```bash
 # Ejecutar todas las pruebas unitarias
 npm run test
 
 # Ejecutar pruebas en modo "reloj" (Watch Mode)
-# Ideal mientras estás programando, se re-ejecuta al guardar cambios
+# Ideal para desarrollo, re-ejecuta tests al guardar cambios
 npm run test:watch
 
 # Ver reporte de Cobertura de Código (Code Coverage)
-# Muestra qué porcentaje del código está cubierto por tests
+# Genera un reporte detallado del % de código probado
 npm run test:cov
+```
 
-## Alcance de las Pruebas (Coverage Scope)
+### Alcance de las Pruebas (Coverage Scope)
 Actualmente, el sistema cuenta con cobertura en los módulos críticos de negocio:
 
 Módulo de Usuarios (UsersModule)
