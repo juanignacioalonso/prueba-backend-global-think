@@ -1,3 +1,9 @@
+# Prueba Técnica Backend - Gestión de Usuarios
+
+Este repositorio contiene la solución a la prueba técnica para el puesto de Backend Developer. El proyecto consiste en una API REST robusta desarrollada con **NestJS** y **MongoDB**, diseñada para ser escalable, segura y fácil de mantener.
+
+Incluye gestión completa de usuarios, abstracción de perfiles de negocio, autenticación segura vía **JWT**, validaciones estrictas, Dockerización y una suite completa de **Pruebas Unitarias**.
+
 ## Características Principales
 
 * **CRUD Completo:** Gestión integral del ciclo de vida de los usuarios.
