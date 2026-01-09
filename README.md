@@ -79,7 +79,7 @@ El sistema implementa control de acceso basado en roles.
 
 ---
 
-## 📡 Endpoints Disponibles
+## Endpoints Disponibles
 
 La documentación interactiva completa se encuentra en: [http://localhost:3000/api](http://localhost:3000/api)
 
@@ -94,7 +94,7 @@ La documentación interactiva completa se encuentra en: [http://localhost:3000/a
 
 ---
 
-## 🧪 Pruebas Unitarias (Testing)
+## Pruebas Unitarias (Testing)
 
 Este proyecto cuenta con una suite robusta de pruebas unitarias implementadas con **Jest**. Se utiliza la técnica de **Mocking** para aislar dependencias y garantizar la fiabilidad del código sin requerir conexión real a la base de datos durante los tests.
 
